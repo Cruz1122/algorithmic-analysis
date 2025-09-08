@@ -1,0 +1,16 @@
+{
+  "name": "algoritmos-monorepo",
+  "private": true,
+  "version": "0.0.1",
+  "description": "Monorepo para Analizador de Complejidades (Next.js + FastAPI)",
+  "packageManager": "pnpm@9",
+  "engines": {
+    "node": ">=20 <21"
+  },
+  "scripts": {
+    "dev": "pnpm -r dev",
+    "build": "pnpm -r build",
+    "test": "pnpm -r test",
+    "lint": "pnpm -r lint"
+  }
+}
