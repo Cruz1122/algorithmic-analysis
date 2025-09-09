@@ -1,0 +1,25 @@
+{
+  "name": "web",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Frontend Next.js (App Router) para Analizador de Complejidades",
+  "engines": { "node": ">=20 <23" },
+  "scripts": {
+    "dev": "next dev --port 3000",
+    "build": "next build",
+    "start": "next start -p 3000",
+    "lint": "echo \"(lint se configurará en la Issue 13)\" && exit 0",
+    "test": "echo \"(tests se agregarán más adelante)\" && exit 0"
+  },
+  "dependencies": {
+    "next": "14.2.0",
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "20.14.9",
+    "@types/react": "18.3.4",
+    "@types/react-dom": "18.3.0",
+    "typescript": "5.5.4"
+  }
+}
