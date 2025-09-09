@@ -33,3 +33,8 @@ coverage/
 
 # Docker (local data)
 docker-data/
+
+# Python (api)
+apps/api/__pycache__/
+apps/api/.venv/
+apps/api/.mypy_cache/
