@@ -17,7 +17,9 @@
     "isolatedModules": true,
     "forceConsistentCasingInFileNames": true,
     "baseUrl": ".",
-    "paths": {},
+    "paths": {
+      "@/*": ["./src/*"]
+    },
     "skipLibCheck": true,
     "esModuleInterop": true,
     "plugins": [
