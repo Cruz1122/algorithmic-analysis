@@ -38,3 +38,6 @@ docker-data/
 apps/api/__pycache__/
 apps/api/.venv/
 apps/api/.mypy_cache/
+
+# Stackdump files
+*.stackdump

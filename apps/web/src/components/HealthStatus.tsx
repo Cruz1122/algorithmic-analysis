@@ -2,59 +2,79 @@
 
 import { useEffect, useState } from "react";
 
-type Health = { status: string; error?: string };
+type BackendStatus = 'active' | 'warning' | 'error' | 'loading';
 
 export default function HealthStatus() {
-    const [state, setState] = useState<"loading" | "ok" | "error">("loading");
-    const [error, setError] = useState<string | null>(null);
+  const [status, setStatus] = useState<BackendStatus>('loading');
 
-    useEffect(() => {
-        let cancelled = false;
-        fetch("/api/health", { cache: "no-store" })
-            .then(async (r) => {
-                const data = (await r.json()) as Health;
-                if (cancelled) return;
-                if (r.ok && data.status === "ok") setState("ok");
-                else {
-                    setState("error");
-                    setError(data.error || `HTTP ${r.status}`);
-                }
-            })
-            .catch((e) => {
-                if (cancelled) return;
-                setState("error");
-                setError(e instanceof Error ? e.message : String(e));
-            });
-        return () => {
-            cancelled = true;
+  useEffect(() => {
+    const checkBackend = async () => {
+      try {
+        const response = await fetch('/api/health');
+        
+        if (response.ok) {
+          const data = await response.json();
+          // Determinar estado basado en la respuesta
+          if (data.status === 'ok') {
+            setStatus('active');
+          } else if (data.status === 'warning') {
+            setStatus('warning');
+          } else {
+            setStatus('error');
+          }
+        } else {
+          setStatus('error');
+        }
+      } catch {
+        setStatus('error');
+      }
+    };
+
+    checkBackend();
+    const interval = setInterval(checkBackend, 30000);
+    
+    return () => clearInterval(interval);
+  }, []);
+
+  const getStatusConfig = (status: BackendStatus) => {
+    switch (status) {
+      case 'active':
+        return {
+          color: 'bg-green-500',
+          text: 'Backend conectado',
+          textColor: 'text-green-400'
         };
-    }, []);
-
-    if (state === "loading") {
-        return (
-            <span className="mt-4 inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium
-                      border-slate-300 bg-slate-50 text-slate-800
-                      dark:border-slate-800 dark:bg-slate-900/30 dark:text-slate-200">
-                API: comprobando…
-            </span>
-        );
+      case 'warning':
+        return {
+          color: 'bg-yellow-500',
+          text: 'Backend con advertencia',
+          textColor: 'text-yellow-400'
+        };
+      case 'error':
+        return {
+          color: 'bg-red-500',
+          text: 'Backend desconectado',
+          textColor: 'text-red-400'
+        };
+      case 'loading':
+        return {
+          color: 'bg-gray-500 animate-pulse',
+          text: 'Verificando backend...',
+          textColor: 'text-gray-400'
+        };
     }
+  };
 
-    if (state === "ok") {
-        return (
-            <span className="mt-4 inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium
-                      border-emerald-300 bg-emerald-50 text-emerald-800
-                      dark:border-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-200">
-                API: OK
-            </span>
-        );
-    }
+  const config = getStatusConfig(status);
 
-    return (
-        <span className="mt-4 inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium
-                      border-rose-300 bg-rose-50 text-rose-800
-                      dark:border-rose-800 dark:bg-rose-900/30 dark:text-rose-200">
-            API: error{error ? ` — ${error}` : ""}
+  return (
+    <div className="glass-card p-4 rounded-md">
+      <div className="flex items-center gap-3">
+        <div className={`h-3 w-3 rounded-full ${config.color}`}></div>
+        <span className={`text-sm font-medium ${config.textColor}`}>
+          {config.text}
         </span>
-    );
+      </div>
+    </div>
+  );
 }
