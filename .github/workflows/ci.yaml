@@ -54,6 +54,17 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      # Setup Next.js build cache
+      - name: Setup Next.js build cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            apps/web/.next/cache
+            apps/web/.next/static
+          key: ${{ runner.os }}-nextjs-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ hashFiles('apps/web/**/*.{js,jsx,ts,tsx,css,scss,json}') }}
+          restore-keys: |
+            ${{ runner.os }}-nextjs-${{ hashFiles('**/pnpm-lock.yaml') }}-
+
       # Build packages en orden correcto
       - name: Build @aa/types
         run: pnpm -C packages/types build
@@ -70,7 +81,7 @@ jobs:
 
       # Build crítico de web (debe pasar)
       - name: Build web app
-        run: pnpm -C apps/web build
+        run: pnpm -C apps/web build:ci
 
       # Python setup y smoke test
       - name: Setup Python
