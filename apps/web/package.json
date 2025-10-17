@@ -8,7 +8,8 @@
   },
   "scripts": {
     "dev": "next dev --port 3000",
-    "build": "next build",
+    "build": "NEXT_TELEMETRY_DISABLED=1 next build",
+    "build:ci": "NEXT_TELEMETRY_DISABLED=1 next build --no-lint",
     "start": "next start -p 3000",
     "test": "echo \"(tests se agregarán más adelante)\" && exit 0",
     "lint": "eslint \"src/**/*.{ts,tsx}\"",

@@ -6,6 +6,12 @@ import Header from "@/components/Header";
 import NavigationLink from "@/components/NavigationLink";
 import ChatBot from "@/components/ChatBot";
 
+interface Message {
+  id: string;
+  content: string;
+  sender: 'user' | 'bot';
+  timestamp: Date;
+}
 
 export default function HomePage() {
   const [mode, setMode] = useState<'ai' | 'manual'>('ai');
@@ -13,7 +19,7 @@ export default function HomePage() {
   const [inputMessage, setInputMessage] = useState("");
   const [isAnimating, setIsAnimating] = useState(false);
   const [isSwitching, setIsSwitching] = useState(false);
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState<Message[]>([]);
 
   // Restaurar historial desde sessionStorage al montar
   useEffect(() => {
@@ -22,7 +28,12 @@ export default function HomePage() {
       if (raw) {
         const parsed = JSON.parse(raw);
         if (Array.isArray(parsed)) {
-          setMessages(parsed.map((m: any) => ({ ...m, timestamp: new Date(m.timestamp) })));
+          setMessages(parsed.map((m: any) => ({ 
+            id: m.id,
+            content: m.content,
+            sender: m.sender,
+            timestamp: new Date(m.timestamp) 
+          })));
         }
       }
     } catch (_) {
@@ -33,7 +44,12 @@ export default function HomePage() {
   // Guardar historial en sessionStorage en cada cambio
   useEffect(() => {
     try {
-      const serializable = messages.map((m: any) => ({ ...m, timestamp: (m.timestamp instanceof Date ? m.timestamp.toISOString() : m.timestamp) }));
+      const serializable = messages.map((m: Message) => ({ 
+        id: m.id,
+        content: m.content,
+        sender: m.sender,
+        timestamp: m.timestamp instanceof Date ? m.timestamp.toISOString() : m.timestamp 
+      }));
       sessionStorage.setItem("aa_chat_messages", JSON.stringify(serializable));
     } catch (_) {
       // noop
@@ -47,8 +63,8 @@ export default function HomePage() {
     setTimeout(() => {
       setChatOpen(true);
       setIsAnimating(false);
-      setMessages((prev: any[]) => {
-        const userMsg = {
+      setMessages((prev: Message[]) => {
+        const userMsg: Message = {
           id: `user-${Date.now()}`,
           content: inputMessage,
           sender: 'user',
@@ -59,7 +75,7 @@ export default function HomePage() {
             {
               id: 'welcome',
               content: "¡Hola! Soy Jhon Jairo, tu asistente para análisis de algoritmos. ¿En qué puedo ayudarte hoy?",
-              sender: 'bot',
+              sender: 'bot' as const,
               timestamp: new Date(),
             },
             userMsg,
